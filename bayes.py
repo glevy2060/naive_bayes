@@ -45,17 +45,25 @@ def bayeslearn(x_train: np.array, y_train: np.array):
     return all_pos, ppos, pneg
 
 
+def calc_sum(all_pos, ppos, pneg, x):
+    pred = np.log(all_pos / (1-all_pos))
+    for i in range(len(x)):
+        if x[i] == 1:
+            pred += np.log(ppos[i] / pneg[i])
+        else:
+            pred += np.log((1-ppos[i]) / (1-pneg[i]))
+    return pred
+
+
 def bayespredict(allpos: float, ppos: np.array, pneg: np.array, x_test: np.array):
-    """
-
-    :param allpos: scalar between 0 and 1, indicating the fraction of positive labels in the training sample
-    :param ppos: numpy array of size (d, 1) containing the empirical plug-in estimate of the positive conditional probabilities
-    :param pneg: numpy array of size (d, 1) containing the empirical plug-in estimate of the negative conditional probabilities
-    :param x_test: numpy array of size (n, d) containing the test samples
-    :return: numpy array of size (n, 1) containing the predicted labels of the test samples
-    """
-    raise NotImplementedError()
-
+    y = np.zeros(len(x_test))
+    for i in range(len(x_test)):
+        pred = calc_sum(allpos, ppos, pneg, x_test[i])
+        if pred >= 0:
+            y[i] = 1
+        else:
+            y[i] = -1
+    return y.reshape((len(y), 1))
 
 
 
@@ -127,8 +135,7 @@ def q7c(U, X):
 
 
 if __name__ == '__main__':
-    # before submitting, make sure that the function simple_test runs without errors
-    #simple_test()
-    print(q7a())
-    U, X = q7b()
-    print(q7c(U, X))
+    simple_test()
+    # print(q7a())
+    # U, X = q7b()
+    # print(q7c(U, X))
